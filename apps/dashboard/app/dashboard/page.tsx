@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   AlertCircle
 } from "lucide-react";
+import Playground from "@/components/dashboard/Playground";
 
 export default function DashboardPage() {
   return (
@@ -39,12 +40,12 @@ export default function DashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Token Usage", value: "1.2M", change: "+12%", icon: Activity, color: "text-blue-400" },
-          { label: "Active Keys", value: "8", change: "Stable", icon: Zap, color: "text-primary" },
-          { label: "Cost (MTD)", value: "$42.50", change: "+$5.20", icon: TrendingUp, color: "text-green-400" },
-          { label: "Avg. Latency", value: "82ms", change: "-4ms", icon: Cpu, color: "text-purple-400" }
+          { label: "Total Requests", value: "24,592", change: "+18%", icon: Activity, color: "text-blue-400" },
+          { label: "Tokens Used", value: "8.4M", change: "+12%", icon: Zap, color: "text-purple-400" },
+          { label: "Cost Estimate", value: "$142.50", change: "+$24.20", icon: TrendingUp, color: "text-green-400" },
+          { label: "Avg. Latency", value: "82ms", change: "-4ms", icon: Cpu, color: "text-amber-400" }
         ].map((stat, i) => (
-          <Card key={i} className="group hover:border-primary/20 transition-all">
+          <Card key={i} className="group bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:border-primary/30 transition-all shadow-xl relative overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                 {stat.label}
@@ -65,12 +66,17 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Model Quick Actions */}
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-xl font-bold">Top Models</CardTitle>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 flex-1">
+        
+        {/* Core Interaction Area */}
+        <div className="lg:col-span-2 space-y-8">
+          <Playground />
+          
+          {/* Model Quick Actions */}
+          <Card className="bg-white/5 backdrop-blur-md border-white/10">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold">Top Models</CardTitle>
               <CardDescription>Your most used model endpoints this week.</CardDescription>
             </div>
             <Button variant="ghost" size="sm" className="text-primary font-bold">View All <ChevronRight className="w-4 h-4 ml-1" /></Button>
@@ -108,8 +114,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        </div>
+
         {/* System Health / Logs */}
-        <Card>
+        <Card className="bg-white/5 backdrop-blur-md border-white/10 h-fit">
           <CardHeader>
             <CardTitle className="text-xl font-bold">System Health</CardTitle>
             <CardDescription>Live status of your deployments.</CardDescription>
