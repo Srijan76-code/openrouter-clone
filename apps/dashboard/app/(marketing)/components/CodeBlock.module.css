@@ -4,18 +4,27 @@
 }
 
 .container {
-  max-width: 1280px;
   width: 100%;
-  margin: 0 auto;
-  padding: 0 48px;
+  max-width: 1800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
-  .container { padding: 0 32px; }
+  .container {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
 }
 
 @media (max-width: 768px) {
-  .container { padding: 0 20px; }
+  .container {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .grid {
@@ -36,11 +45,11 @@
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(2.5rem, 5vw, 4rem);
-  font-weight: 800;
+  font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+  font-weight: 700;
   color: #ffffff;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
+  letter-spacing: -0.05em;
+  line-height: 1;
   margin-bottom: 20px;
 }
 

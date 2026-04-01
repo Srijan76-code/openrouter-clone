@@ -8,7 +8,7 @@ type Tab = 'python' | 'javascript' | 'curl'
 const pythonCode = `from openai import OpenAI
 
 client = OpenAI(
-  base_url="https://api.openrouterclone.ai/v1",
+  base_url="https://api.aetherroute.ai/v1",
   api_key="sk-your-api-key"
 )
 
@@ -22,7 +22,7 @@ print(response.choices[0].message.content)`
 const jsCode = `import OpenAI from 'openai';
 
 const client = new OpenAI({
-  baseURL: 'https://api.openrouterclone.ai/v1',
+  baseURL: 'https://api.aetherroute.ai/v1',
   apiKey: 'sk-your-api-key',
 });
 
@@ -33,7 +33,7 @@ const response = await client.chat.completions.create({
 
 console.log(response.choices[0].message.content);`
 
-const curlCode = `curl https://api.openrouterclone.ai/v1/chat/completions \\
+const curlCode = `curl https://api.aetherroute.ai/v1/chat/completions \\
   -H "Authorization: Bearer sk-your-api-key" \\
   -H "Content-Type: application/json" \\
   -d '{"model": "anthropic/claude-sonnet-4-6",

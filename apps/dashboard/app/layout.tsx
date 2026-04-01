@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenRouter Clone — One API. Every Model.",
+  title: "AetherRoute — One API. Every Model.",
   description:
     "Access 300+ LLMs through a single OpenAI-compatible endpoint. Switch models without changing your code.",
 };

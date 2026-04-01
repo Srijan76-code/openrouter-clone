@@ -6,6 +6,13 @@
 }
 
 .wrapper {
+  width: 100%;
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 48px;
+  padding-right: 48px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -13,6 +20,20 @@
   height: 110px;
   gap: 10px;
   overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .wrapper {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .wrapper {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 .label {
