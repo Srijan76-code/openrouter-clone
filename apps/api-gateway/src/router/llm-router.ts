@@ -5,7 +5,7 @@ import { messageTransformer } from "../transform/message-transformer.ts";
 import { RetryHandler, type RetryPolicy, DEFAULT_RETRY_POLICY } from "./retry-handler.ts";
 import { getProviderStrategy } from "./provider-strategy.ts";
 import { decide, RouterAction } from "./decision-engine.ts";
-
+import "dotenv/config"
 export class LLMRouter {
   private providers: Map<string, AIProvider>;
   private retryHandler: RetryHandler;
