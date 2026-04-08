@@ -1,15 +1,15 @@
-// @repo/types — Shared type definitions
-// Single source of truth for all types used across apps and packages.
+// ─── @openrouter/types ───────────────────────────────────────
+// Re-export everything from all type modules
 
 export type {
-  ChatMessage,
   ProviderStrategy,
+  ChatMessage,
   NormalizedChatRequest,
 } from "./request.ts";
 
 export type {
-  CostConfig,
   MetricsConfig,
+  CostConfig,
   ProviderConfig,
 } from "./provider.ts";
 
@@ -20,5 +20,7 @@ export type {
 
 export type {
   CostPerToken,
+  CostPerRequest,
   ModelRegistryEntry,
+  OpenRouterModel,
 } from "./registry.ts";

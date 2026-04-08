@@ -1,53 +1,26 @@
-/**
- * @repo/types — Provider Types
- *
- * Configuration types for LLM provider definitions.
- */
-
-/** Cost configuration per token for a provider */
-export interface CostConfig {
-  /** Cost per input token (USD) */
-  inputCostPerToken: number;
-
-  /** Cost per output token (USD) */
-  outputCostPerToken: number;
-
-  /** Optional cost per image (USD) */
-  imageCostPerUnit?: number;
-}
-
-/** Performance metrics for a provider */
+// ─── Metrics Config ──────────────────────────────────────────
 export interface MetricsConfig {
-  /** Average latency in milliseconds */
-  avgLatencyMs: number;
-
-  /** Tokens per second throughput */
-  tokensPerSecond: number;
-
-  /** Uptime percentage (0-100) */
-  uptimePercent: number;
+  latency: number;     // 0 → 1 (higher = faster)
+  throughput: number;  // 0 → 1
+  reliability: number; // 0 → 1
 }
 
-/** Full provider configuration */
+// ─── Cost Config ─────────────────────────────────────────────
+export interface CostConfig {
+  input: number;
+  output: number;
+
+  cache?: number;
+  reasoning?: number;
+}
+
+// ─── Provider Config ─────────────────────────────────────────
 export interface ProviderConfig {
-  /** Provider identifier (e.g., "google", "openai", "anthropic") */
-  id: string;
+  provider: string;        // e.g. "openai", "azure"
+  provider_model: string;  // exact provider model name
 
-  /** Human-readable name */
-  name: string;
-
-  /** API base URL */
-  baseUrl: string;
-
-  /** Supported model IDs */
-  models: string[];
-
-  /** Cost structure */
   cost: CostConfig;
+  metrics: MetricsConfig;
 
-  /** Performance metrics */
-  metrics?: MetricsConfig;
-
-  /** Whether this provider is currently enabled */
-  enabled: boolean;
+  priority?: number;       // optional but recommended
 }

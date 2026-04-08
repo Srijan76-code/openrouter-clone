@@ -1,50 +1,49 @@
-/**
- * @repo/types — Registry Types
- *
- * Types for the model registry (OpenRouter model data).
- */
-
-/** Cost per token in the registry */
+// ─── Cost Per Token ──────────────────────────────────────────
 export interface CostPerToken {
-  /** Cost per prompt/input token (string for precision) */
-  prompt: string;
-
-  /** Cost per completion/output token (string for precision) */
-  completion: string;
-
-  /** Cost per image token, if applicable */
-  image?: string;
-
-  /** Cost per request, if applicable */
-  request?: string;
+  input: number;
+  output: number;
+  reasoning?: number;
+  cache_read?: number;
 }
 
-/** A single entry in the model registry */
+// ─── Cost Per Request ────────────────────────────────────────
+export interface CostPerRequest {
+  web_search?: number;
+  request?: number;
+  image?: number;
+}
+
+// ─── Model Registry Entry ────────────────────────────────────
 export interface ModelRegistryEntry {
-  /** Model ID as used in API requests */
+  slug: string;
+  provider: string;
+  tokenizer: string;
+
+  context_window: number;
+  max_input_tokens: number;
+  max_output_tokens: number;
+
+  cost_per_token: CostPerToken;
+  cost_per_request: CostPerRequest;
+
+  worst_case_cost: number;
+}
+
+// ─── OpenRouter Raw Model (API shape) ────────────────────────
+export interface OpenRouterModel {
   id: string;
-
-  /** Human-readable model name */
-  name: string;
-
-  /** Description of the model */
-  description?: string;
-
-  /** Context length in tokens */
   context_length: number;
-
-  /** Pricing information */
-  pricing: CostPerToken;
-
-  /** Model architecture details */
-  architecture?: {
-    tokenizer?: string;
-    modality?: string;
+  architecture?: { tokenizer?: string };
+  pricing?: {
+    prompt?: string;
+    completion?: string;
+    image?: string;
+    request?: string;
+    internal_reasoning?: string;
+    input_cache_read?: string;
+    web_search?: string;
   };
-
-  /** Top provider information */
   top_provider?: {
-    max_completion_tokens?: number;
-    is_moderated?: boolean;
+    max_completion_tokens?: number | null;
   };
 }
