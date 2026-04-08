@@ -1,5 +1,5 @@
 {
-  "name": "@repo/api-backend",
+  "name": "@repo/api-gateway",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {

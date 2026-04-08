@@ -1,0 +1,16 @@
+{
+  "extends": "./packages/typescript-config/base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [],
+  "references": [
+    { "path": "./apps/api-gateway" },
+    { "path": "./apps/primary-backend" },
+    { "path": "./apps/devtools" },
+    { "path": "./packages/db" },
+    { "path": "./packages/types" },
+    { "path": "./packages/config" },
+    { "path": "./packages/utils" }
+  ]
+}
