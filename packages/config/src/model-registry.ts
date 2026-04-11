@@ -1,5 +1,5 @@
 import type { OpenRouterModel, ModelRegistryEntry } from "@repo/types";
-import openrouterModelRegistry from "./openrouter-registry.json" with { type: "json" };
+import openrouterModelRegistry from "./openrouter-registry.json";
 
 // ─── Helpers ─────────────────────────────────────────────────
 function num(v?: string) {
