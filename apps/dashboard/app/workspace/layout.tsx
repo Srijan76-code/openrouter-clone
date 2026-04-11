@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-
+import { UserButton } from "@clerk/nextjs";
 const mainNavItems = [
   { title: "API Keys", icon: KeyRound, href: "/workspace/api-keys" },
   { title: "Guardrails", icon: ShieldCheck, href: "#" },
@@ -70,14 +70,10 @@ export default function WorkspaceLayout({
 
           <Separator orientation="vertical" className="h-6 hidden sm:block" />
 
-          <Button variant="ghost" size="sm" className="flex items-center gap-2 px-2 hover:bg-transparent hover:text-foreground transition-colors">
-            <Avatar className="h-6 w-6">
-              <AvatarImage src="" />
-              <AvatarFallback className="bg-primary/20 text-primary text-xs">A</AvatarFallback>
-            </Avatar>
-            <span className="font-medium hidden sm:block">Personal</span>
-            <ChevronDown className="h-4 w-4 opacity-70 hidden sm:block" />
-          </Button>
+          <div className="flex items-center gap-2 ml-2">
+            <UserButton />
+            <span className="font-medium hidden sm:block text-sm">Personal</span>
+          </div>
         </div>
       </header>
 

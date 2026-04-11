@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import Link from 'next/link'
+import { Show, SignInButton, UserButton } from '@clerk/nextjs'
 import styles from './Navbar.module.css'
 
 export default function Navbar() {
@@ -36,9 +38,25 @@ export default function Navbar() {
             <li><a href="#pricing">Pricing</a></li>
           </ul>
 
-          <Link href="/workspace/api-keys" className={styles.cta}>
-            Get API Key
-          </Link>
+          <div className="flex items-center gap-4 hidden md:flex">
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button className={styles.cta}>Sign In</button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in">
+              <Link href="/workspace/api-keys" className={styles.cta}>
+                Dashboard
+              </Link>
+              <UserButton />
+            </Show>
+          </div>
+
+          <div className="flex items-center gap-4 md:hidden">
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </div>
 
           <button
             className={styles.hamburger}
