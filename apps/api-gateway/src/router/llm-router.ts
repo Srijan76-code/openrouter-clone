@@ -105,6 +105,8 @@ export class LLMRouter {
     console.log(`\n[Stage 1: Routing Start] Models: ${normalized.model_slug.join(", ")}`);
 
     try {
+      let missingModels = 0;
+
       for (const model of normalized.model_slug) {
         const modelName = model.split("/")[1];
         console.log(`\n[Stage 2: Model Selection] Attempting model: ${modelName}`);
@@ -113,6 +115,7 @@ export class LLMRouter {
 
         if (!modelConfig) {
           console.log(`[Model Fail] ${modelName} is completely missing from config`);
+          missingModels++;
           continue;
         }
 
@@ -167,6 +170,13 @@ export class LLMRouter {
         }
 
         console.log(`[Model Fail] ${modelName} exhausted`);
+      }
+
+      if (missingModels === normalized.model_slug.length) {
+        const err = new Error("model is not registered");
+        err.name = "ModelNotRegisteredError";
+        collector.failRun(err.message);
+        throw err;
       }
 
       const err = new Error("All models and providers failed.");

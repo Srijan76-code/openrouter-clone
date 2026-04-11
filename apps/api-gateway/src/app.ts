@@ -29,6 +29,9 @@ class ApiGateway {
       });
     });
 
+    // OpenAI SDK standard path
+    this.app.post("/v1/chat/completions", this.handleChatCompletions);
+
     this.app.post("/chat/completions", this.handleChatCompletions);
   }
 
@@ -65,8 +68,21 @@ class ApiGateway {
 
       console.log("response from llm router:", response);
       res.json(response);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      
+      if (error.name === "ModelNotRegisteredError") {
+        res.status(404).json({
+          error: {
+            message: "model is not registered",
+            type: "invalid_request_error",
+            param: "model",
+            code: "model_not_found"
+          }
+        });
+        return;
+      }
+
       res.status(500).json({ error: "Failed to process request" });
     }
   };
