@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,4 +5,201 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id            Int      @id @default(autoincrement())
+  clerkUserId   String   @unique
+  credits       Float    @default(1000)
+
+  apiKeys       PlatformUserApiKey[]
+  byoKeys       UserProviderKey[]
+  conversations Conversation[]
+  transactions  Transaction[]
+  presets       Preset[]
+}
+
+model PlatformUserApiKey {
+  id            Int     @id @default(autoincrement())
+  userId        Int
+  keyHash       String  @unique
+
+  name          String
+
+  rateLimitRPM  Int
+  rateLimitTPM  Int
+
+  budgetLimit   Float?
+  zdrEnabled    Boolean  @default(false)
+
+  creditsUsed   Float    @default(0)
+
+  isActive      Boolean  @default(true)
+  lastUsedAt    DateTime?
+
+  user          User @relation(fields: [userId], references: [id])
+  conversations Conversation[]
+}
+
+model PlatformApiKey {
+  id            Int    @id @default(autoincrement())
+  providerId    Int
+  encryptedKey  String
+
+  rpmLimit      Int
+  tpmLimit      Int
+
+  priority      Int
+  status        String
+
+  provider      Provider @relation(fields: [providerId], references: [id])
+}
+
+model UserProviderKey {
+  id            Int    @id @default(autoincrement())
+  userId        Int
+  providerId    Int
+  encryptedKey  String
+
+  isActive      Boolean @default(true)
+
+  user          User @relation(fields: [userId], references: [id])
+  provider      Provider @relation(fields: [providerId], references: [id])
+}
+
+model Provider {
+  id        Int    @id @default(autoincrement())
+  name      String
+  baseUrl   String
+
+  latencyScore    Float?
+  throughputScore Float?
+  reliabilityScore Float?
+
+  models    ModelProviderMapping[]
+  keys      PlatformApiKey[]
+  userKeys  UserProviderKey[]
+}
+
+model Model {
+  id    Int    @id @default(autoincrement())
+  name  String
+  slug  String @unique
+
+  type  String
+
+  mappings ModelProviderMapping[]
+}
+
+model ModelProviderMapping {
+  id          Int @id @default(autoincrement())
+
+  modelId     Int
+  providerId  Int
+
+  providerModelName String
+
+  inputCost   Float
+  outputCost  Float
+
+  latency     Float?
+  throughput  Float?
+
+  priority    Int
+
+  supportsStreaming Boolean @default(true)
+
+  model       Model    @relation(fields: [modelId], references: [id])
+  provider    Provider @relation(fields: [providerId], references: [id])
+
+  conversations Conversation[]
+}
+
+model Conversation {
+  id        Int @id @default(autoincrement())
+
+  userId    Int
+  apiKeyId  Int
+  mappingId Int
+
+  input     String
+  output    String
+
+  inputTokens  Int
+  outputTokens Int
+
+  cost         Float
+
+  mode         String
+  status       String
+
+  createdAt DateTime @default(now())
+
+  user    User @relation(fields: [userId], references: [id])
+  apiKey  PlatformUserApiKey @relation(fields: [apiKeyId], references: [id])
+  mapping ModelProviderMapping @relation(fields: [mappingId], references: [id])
+
+  traces  Trace[]
+}
+
+model RequestAttempt {
+  id             Int @id @default(autoincrement())
+  conversationId Int
+
+  providerId     Int
+  apiKeyId       Int?
+
+  status         String
+  latency        Float
+
+  createdAt      DateTime @default(now())
+}
+
+model Preset {
+  id       Int @id @default(autoincrement())
+  userId   Int
+
+  name     String
+  config   Json
+
+  user     User @relation(fields: [userId], references: [id])
+}
+
+model Transaction {
+  id        Int @id @default(autoincrement())
+
+  userId    Int
+  amount    Float
+  status    String
+  provider  String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model UsageAnalytics {
+  id         Int @id @default(autoincrement())
+
+  userId     Int?
+  modelId    Int?
+  providerId Int?
+
+  totalRequests Int
+  totalTokens   Int
+  totalCost     Float
+
+  date       DateTime
+}
+
+model Trace {
+  id             Int @id @default(autoincrement())
+  conversationId Int
+
+  step           String
+  metadata       Json
+
+  createdAt      DateTime @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
