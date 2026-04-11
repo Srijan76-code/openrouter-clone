@@ -37,7 +37,7 @@ export default function WorkspaceLayout({
   return (
     <div className="flex h-screen w-full flex-col bg-background text-foreground font-sans selection:bg-primary/30">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
+      <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-between border-b-[0.5px] bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:px-6">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <Rocket className="h-5 w-5 text-primary" />
@@ -83,7 +83,7 @@ export default function WorkspaceLayout({
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
-        <aside className="w-64 overflow-y-auto border-r bg-background py-6 hidden md:flex flex-col gap-8 shrink-0">
+        <aside className="w-64 overflow-y-auto border-r-[0.5px] bg-background py-6 hidden md:flex flex-col gap-8 shrink-0">
           <nav className="flex flex-col gap-1 px-3">
             {mainNavItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
