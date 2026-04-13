@@ -1,0 +1,9 @@
+{
+  "title": "Models & Routing",
+  "icon": "Layers",
+  "pages": [
+    "model-fallbacks",
+    "provider-selection",
+    "routing-strategies"
+  ]
+}

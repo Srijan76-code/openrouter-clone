@@ -1,0 +1,11 @@
+{
+  "title": "Developer Tooling",
+  "icon": "Terminal",
+  "pages": [
+    "devtools-tracing",
+    "live-status",
+    "payload-visibility",
+    "metrics",
+    "visibility"
+  ]
+}

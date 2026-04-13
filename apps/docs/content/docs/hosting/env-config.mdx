@@ -1,0 +1,19 @@
+---
+title: Environment Configuration
+description: Configure your gateway instance.
+---
+
+OpenRouter uses environment variables for configuration. Copy `.env.example` to `.env` and adjust the values as needed.
+
+### Core Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | - |
+| `REDIS_URL` | Redis connection string | `redis://localhost:6379` |
+| `PORT` | Primary API port | `4000` |
+| `JWT_SECRET` | Secret for dashboard auth | - |
+
+### Provider Configuration
+
+You can also specify default provider keys here, though managing them via the dashboard and Redis Key Pool is recommended for production setups.

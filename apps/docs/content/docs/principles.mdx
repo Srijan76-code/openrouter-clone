@@ -1,0 +1,28 @@
+---
+title: Principles
+description: The core design philosophy of OpenRouter.
+---
+
+OpenRouter is built on three fundamental pillars designed 
+to minimize developer friction and maximize system resilience.
+
+## Core Pillars
+
+The architecture prioritizes stability and interoperability 
+above all else.
+
+### Interoperability
+The gateway provides a single interface for every provider. 
+We strictly adhere to the OpenAI API specification to eliminate 
+the need for custom integration logic across different model families.
+
+### Reliability
+System resilience is achieved through automation. 
+Retries, fallbacks, and intelligent provider selection occur 
+transparently at the network layer without requiring manual intervention.
+
+### Transparency
+Absolute visibility is a core requirement. 
+Every request is tracked, failure modes are categorized, 
+and resource consumption is reported with millisecond precision.
+

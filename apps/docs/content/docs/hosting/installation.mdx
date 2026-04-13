@@ -1,0 +1,43 @@
+---
+title: Installation
+description: Deployment and dependency configuration.
+---
+
+OpenRouter requires a standard web infrastructure to manage 
+asynchronous tasks and persistent telemetry. Ensure your 
+environment meets the following specifications before deployment.
+
+## System Prerequisites
+
+The gateway relies on three core technologies to ensure high 
+availability and localized execution.
+
+- Node.js v18 or higher provides the runtime environment for the gateway orchestrator.
+- PostgreSQL v14 or higher persists telemetry data and auditing logs asynchronously.
+- Redis v6 or higher manages the global rate limiter and real-time key leasing.
+
+## Implementation Steps
+
+Deploy the source code to your local or private cloud infrastructure.
+
+```bash
+git clone https://github.com/Srijan76-code/openrouter-clone.git
+cd openrouter-clone
+npm install
+```
+
+## Initial Configuration
+
+Establish the link between the application layer and your 
+infrastructure services.
+
+- Initialize the environment by copying the example template file.
+- Configure the `DATABASE_URL` and `REDIS_URL` endpoints within the newly created file.
+- Execute the database migrations to prepare the persistence layer.
+
+```bash
+cp .env.example .env
+npm run db:migrate
+npm run dev
+```
+

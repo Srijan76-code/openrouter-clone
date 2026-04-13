@@ -1,0 +1,20 @@
+---
+title: Streaming
+description: Real-time token streaming with OpenRouter.
+---
+
+OpenRouter supports real-time token streaming via Server-Sent Events (SSE). The gateway normalizes provider-specific chunk formats into a single predictable interface regardless of which provider fulfills the request.
+
+Enable streaming exactly as you would with the OpenAI SDK:
+
+```typescript
+const stream = await openai.chat.completions.create({
+  model: "anthropic/claude-3-haiku",
+  messages: [{ role: "user", content: "Tell me a story." }],
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.choices[0]?.delta?.content ?? "");
+}
+```

@@ -1,0 +1,51 @@
+---
+title: Quickstart
+description: Deploy and integrate OpenRouter in minutes.
+---
+
+OpenRouter operates as a unified intelligence layer. Integration 
+follows standard OpenAI patterns, making it compatible with existing 
+client libraries and frameworks.
+
+## 1. Connection Details
+
+Use the following base URL for all API requests directed toward 
+your gateway instance.
+
+`https://openrouter-clone-api-gateway.onrender.com/v1`
+
+## 2. Basic Example
+
+Install the OpenAI client library to begin integration.
+
+```bash
+npm install openai
+```
+
+Initialize the client with your gateway URL and access key.
+
+```javascript
+import OpenAI from "openai";
+const openai = new OpenAI({
+  baseURL: "https://openrouter-clone-api-gateway.onrender.com/v1",
+  apiKey: "gateway-sk-12345",
+});
+async function main() {
+  const completion = await openai.chat.completions.create({
+    model: "google/gemini-3.1-pro",
+    messages: [
+      { role: "system", content: "You are a helpful assistant." },
+      { role: "user", content: "What is the capital of Germany?" }
+    ],
+  });
+  console.log(completion.choices[0].message);
+}
+main();
+```
+
+## 3. Next Steps
+
+- Authenticate your requests securely by reviewing [Authentication](/docs/authentication).
+- Implement robust [Model Fallbacks](/docs/model-fallbacks) for high reliability.
+- Configure [Routing Strategies](/docs/routing-strategies) to optimize for speed or cost.
+

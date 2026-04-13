@@ -1,0 +1,36 @@
+---
+title: FAQ
+description: Frequently asked questions about the OpenRouter gateway.
+---
+
+This section addresses common inquiries regarding the architecture 
+and operational capabilities of the gateway.
+
+## Proxy Architecture
+
+**Is OpenRouter a proxy?**  
+The gateway operates as an intelligent proxy layer. It sits between 
+your application and external LLM providers, abstracting 
+authentication and response formatting.
+
+## Key Management
+
+**Do I need my own provider keys?**  
+Integration requires keys for each underlying provider you intend to use. 
+The gateway can manage these keys centrally or allow users to supply 
+their own credentials via the [Bring Your Own Key](/docs/features/byok) system.
+
+## Infrastructure
+
+**Can I self-host the gateway?**  
+The system is designed for private infrastructure deployment. 
+Self-hosting ensures absolute control over request headers, 
+audit logs, and internal key rotation.
+
+## Resilience
+
+**How do fallbacks operate?**  
+If a primary provider encounters a failure, the engine automatically 
+cascades through your configured [fallback chain](/docs/model-fallbacks). 
+The process concludes when a successful response is returned 
+or the chain is exhausted.

@@ -1,0 +1,40 @@
+---
+title: Authentication
+description: Secure your connection to the gateway.
+---
+
+OpenRouter uses standard Bearer token authentication.
+Authorization tokens are generated within the administrative dashboard
+and map directly to specific project environments.
+
+## Integration Methods
+
+The gateway supports multiple integration patterns,
+standardizing authentication across every underlying provider.
+
+### OpenAI SDK
+
+Initialize the client with your gateway URL and the Bearer token.
+The SDK handles the `Authorization` header automatically.
+
+```typescript
+const openai = new OpenAI({
+  baseURL: "https://your-gateway-url/v1",
+  apiKey: "gateway-sk-xxxx",
+});
+```
+
+### Authorization Header
+
+Pass the token directly in the request headers for custom integrations.
+Prefix the key with the `Bearer` scheme as shown below.
+
+```http
+Authorization: Bearer gateway-sk-xxxx
+```
+
+## Security Standards
+
+- Revocation capabilities allow you to invalidate keys instantly from the dashboard.
+- Scoped access limits tokens to specific projects or model families.
+- Environment isolation ensures that development keys cannot access production resources.

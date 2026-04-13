@@ -1,0 +1,12 @@
+---
+title: Live Status Tracking
+description: Real-time tracking of each execution state.
+---
+
+As your request moves through the OpenRouter pipeline, you can watch it transition through various states in real-time within DevTools:
+
+1. **Pending**: The request has been received and is waiting for provider selection.
+2. **Executing**: A provider has been selected and the request is being processed.
+3. **Streaming**: Response chunks are being normalized and sent back to the client.
+4. **Success**: The request completed successfully.
+5. **Error**: A failure occurred (which may trigger model fallbacks or retries).

@@ -1,0 +1,18 @@
+---
+title: Port Mapping
+description: Service ports for your OpenRouter instance.
+---
+
+Once all services are running, they are accessible at the following default ports:
+
+| Service          | Port  | Description                                  |
+|------------------|-------|----------------------------------------------|
+| **Dashboard**    | 3000  | Management UI for keys and routing configs.  |
+| **API Gateway**  | 3001  | OpenAI-compatible entry point for requests. |
+| **Primary Backend**| 4000  | Core logic and PostgreSQL interface.        |
+| **DevTools**     | 4983  | Real-time request and trace monitoring.      |
+
+<Callout type="idea" title="Tip">
+  Open `localhost:4983` in your browser, then fire any request to the API Gateway
+  (port 3001) and watch the traces populate in real-time.
+</Callout>

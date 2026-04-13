@@ -1,0 +1,71 @@
+---
+title: Response Schema
+description: Structure and format of gateway responses.
+---
+
+OpenRouter returns a unified response format derived from the 
+OpenAI specification. This ensures that every downstream model 
+integration behaves predictably across your infrastructure.
+
+## Completion Object
+
+The execution engine normalizes provider-specific responses into 
+ a single, standardized JSON structure.
+
+```json
+{
+  "id": "chatcmpl-123",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "gpt-4-0613",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "Hello! I am a helpful assistant."
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 9,
+    "completion_tokens": 12,
+    "total_tokens": 21
+  }
+}
+```
+
+<TypeTable
+  type={{
+    id: {
+      type: 'string',
+      description: 'Unique identifier for the chat completion.',
+    },
+    object: {
+      type: 'string',
+      description: 'The object type, which is always chat.completion.',
+    },
+    created: {
+      type: 'number',
+      description: 'The Unix timestamp of when the completion was created.',
+    },
+    model: {
+      type: 'string',
+      description: 'The model used for the completion.',
+    },
+    choices: {
+      type: 'array',
+      description: 'A list of chat completion choices.',
+    },
+    usage: {
+      type: 'object',
+      description: 'Usage statistics for the completion request.',
+    },
+  }}
+/>
+
+## Performance Metrics
+
+The `usage` block provides precise tracking of token consumption. 
+These metrics are calculated by the gateway as responses stream 
+from the underlying providers.
+

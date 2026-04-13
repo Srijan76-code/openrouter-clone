@@ -1,0 +1,26 @@
+---
+title: Introduction
+description: A high-performance, self-hosted LLM gateway.
+---
+
+OpenRouter is a unified API gateway for Large Language Models.
+The system provides a single endpoint for all major providers,
+abstracting the complexity of multiple SDKs and formats.
+
+By routing all requests through a central gateway, you ensure
+resilience against provider outages and latency spikes.
+The infrastructure remains robust while the interface stays simple.
+
+## Core Capabilities
+
+The gateway handles the heavy lifting of provider orchestration,
+allowing you to focus on application logic.
+
+- Unified interface provides a single, OpenAI-compatible endpoint for every supported model.
+- Intelligent failover immediately reroutes requests to secondary providers if a primary fails.
+- Performance optimization captures latency metrics and token usage in real-time.
+- Local deployment ensures full control over your keys and usage data.
+
+Installation requires minimal configuration. Switching existing
+OpenAI integrations to OpenRouter typically involves changing
+two lines of configuration code.

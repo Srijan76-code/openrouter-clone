@@ -1,0 +1,15 @@
+{
+  "title": "Features",
+  "icon": "Zap",
+  "pages": [
+    "streaming",
+    "retry-policy",
+    "tool-calling",
+    "structured-outputs",
+    "byok",
+    "presets",
+    "budget-limits",
+    "multimodality",
+    "zero-completion-insurance"
+  ]
+}

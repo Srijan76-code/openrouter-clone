@@ -1,0 +1,39 @@
+---
+title: DevTools Tracing
+description: Inspect active requests in real-time.
+---
+
+Every request passing through the routing engine leaves a trace. 
+You can inspect these traces directly using the local DevTools 
+instance at `localhost:4983`.
+
+Open your browser. Send a request from your client application. 
+The complete request lifecycle populates immediately.
+
+![DevTools tracing session](/devtools-session.png)
+
+## Trace Capabilities
+
+DevTools provides absolute visibility into the execution pipeline. 
+Each layer of the request is isolated and exposed.
+
+<Cards>
+  <Card
+    title="Live Status"
+    description="Reflects the exact execution state as it transitions from pending, to success, or to failure."
+  />
+  <Card
+    title="Payload Visibility"
+    description="Inspect complete transmission details like headers, raw bodies, and model parameters."
+  />
+  <Card
+    title="Performance Metrics"
+    description="Track exact time-to-first-token, total latency, and token consumption counts."
+  />
+  <Card
+    title="Routing Logic"
+    description="Reveal exact provider selection, retry cascades, and execution fallbacks."
+  />
+</Cards>
+
+The system ensures absolute transparency across every execution step.

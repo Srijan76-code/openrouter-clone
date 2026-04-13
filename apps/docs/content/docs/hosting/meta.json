@@ -1,0 +1,11 @@
+{
+  "title": "Self-Hosting",
+  "icon": "Server",
+  "pages": [
+    "self-hosting-overview",
+    "installation",
+    "env-config",
+    "port-mapping",
+    "db-setup"
+  ]
+}

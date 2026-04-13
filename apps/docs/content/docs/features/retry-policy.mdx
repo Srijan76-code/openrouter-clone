@@ -1,0 +1,36 @@
+---
+title: Retry Policy
+description: Resilient error handling for high-availability applications.
+---
+
+OpenRouter's gateway has a built-in retry mechanism that handles transient network errors and provider timeouts automatically.
+
+### Configuring Retries per Request
+
+You can override the default retry policy by providing the `retry` property in the `extra` extension.
+
+```javascript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  baseURL: "https://openrouter-clone-api-gateway.onrender.com/v1",
+  apiKey: "gateway-sk-12345",
+});
+
+const response = await openai.chat.completions.create({
+  model: "google/gemini-3.1-pro",
+  messages: [{ role: "user", content: "Analyze this dataset." }],
+  
+  // --- OPENROUTER CUSTOM EXTENSIONS ---
+  // @ts-expect-error OpenRouter custom properties
+  extra: {
+    // Set custom retry handler count (default 2)
+    retry: 3 
+  },
+});
+```
+
+### How Retries Work
+- **Retryable Errors**: Only `5xx` server errors, `429` rate limits, and network timeouts trigger a retry. `4xx` client errors (invalid parameters, auth failure) do NOT trigger retries.
+- **Backoff**: The gateway uses exponential backoff with jitter to avoid slamming providers during peak load.
+- **Interaction with Fallbacks**: If you have `fallback_models` defined, the gateway will retry the current model up to the `retry` limit before moving to the next model in the fallback chain.

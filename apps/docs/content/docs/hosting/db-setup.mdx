@@ -1,0 +1,31 @@
+---
+title: Database Setup
+description: Initialize and manage your gateway database.
+---
+
+OpenRouter uses Prisma to manage its PostgreSQL database. Ensure your `DATABASE_URL` is correctly set in your `.env` file before proceeding.
+
+### Initialization
+
+Run the following commands to generate the Prisma client and push the schema to your database:
+
+```bash
+npx turbo run db:generate
+npx turbo run db:push
+```
+
+### Migrations
+
+For production environments, it is recommended to use Prisma migrations:
+
+```bash
+npx prisma migrate dev --name init
+```
+
+### Starting the Services
+
+After the database is initialized, start all services in development mode:
+
+```bash
+npm run dev
+```

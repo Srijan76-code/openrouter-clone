@@ -1,0 +1,16 @@
+---
+title: Structured Outputs
+description: Enforce JSON schemas on provider responses.
+---
+
+OpenRouter supports structured outputs to ensure provider responses strictly follow your provided JSON schema. This is invaluable for extracting data or building reliable agentic workflows.
+
+### usage
+
+```typescript
+const completion = await openai.chat.completions.create({
+  model: "gpt-4o-mini",
+  messages: [...],
+  response_format: { type: "json_object" }
+});
+```

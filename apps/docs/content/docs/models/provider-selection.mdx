@@ -1,0 +1,44 @@
+---
+title: Provider Selection
+description: Direct control over the underlying request destination.
+---
+
+OpenRouter defaults to a balanced routing strategy that prioritizes 
+latency and reliability. You can explicitly override this behavior 
+using the `extra.provider` extension.
+
+## Custom Overrides
+
+Specify a routing strategy or a specific provider identifier 
+within the request to control the execution destination.
+
+```javascript
+const response = await openai.chat.completions.create({
+  model: "google/gemini-3.1-pro",
+  messages: [{ role: "user", content: "Hello!" }],
+  extra: {
+    provider: "cheap"
+  },
+});
+```
+
+## Available Strategies
+
+The engine supports several abstracted routing strategies to 
+simplify complex orchestration.
+
+- Default strategy maintains a balanced state between latency and system reliability.
+- Cheap strategy prioritizes the provider with the lowest current token cost.
+- Reliable strategy selects providers with the highest recent success rates.
+
+## Provider Locking
+
+Integration allows for explicit provider locking by using 
+identifiers such as `google`, `anthropic`, or `vertex`.
+
+```javascript
+extra: {
+  provider: "google"
+}
+```
+

@@ -1,0 +1,53 @@
+---
+title: Request Schema
+description: Technical structure of chat completion requests.
+---
+
+OpenRouter maintains strict adherence to the standard OpenAI 
+chat completions schema. This allows for seamless integration 
+with existing SDKs while providing extended gateway functionality.
+
+## Request Parameters
+
+The Following parameters are supported within the standard POST body. 
+Each parameter maps directly to the underlying provider execution.
+
+<TypeTable
+  type={{
+    model: {
+      type: 'string',
+      required: true,
+      description: 'The identifier of the model to target.',
+    },
+    messages: {
+      type: 'array',
+      required: true,
+      description: 'The chronological list of conversation messages.',
+    },
+    stream: {
+      type: 'boolean',
+      description: 'Enables data-only server-sent event transmission.',
+    },
+    temperature: {
+      type: 'number',
+      description: 'Controls sampling variety between 0 and 2.',
+    },
+    tools: {
+      type: 'array',
+      description: 'Definitions for assistant tool calling capabilities.',
+    },
+  }}
+/>
+
+## Message Object
+
+The message object follows the standard role-based structure. 
+Ensure the content field is populated according to the role type.
+
+```json
+{
+  "role": "user",
+  "content": "Hello, how are you?"
+}
+```
+

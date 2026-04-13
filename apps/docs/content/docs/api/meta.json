@@ -1,0 +1,10 @@
+{
+  "title": "API Reference",
+  "icon": "Code",
+  "pages": [
+    "endpoint-overview",
+    "request-schema",
+    "response-schema",
+    "error-codes"
+  ]
+}

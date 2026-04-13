@@ -1,0 +1,50 @@
+---
+title: Error Codes
+description: Common error responses within the routing environment.
+---
+
+OpenRouter utilizes standard HTTP status codes to communicate execution 
+failures. Every error response is accompanied by a descriptive message 
+identifying the source of the issue.
+
+## Status Mapping
+
+The Following table identifies the most common error states 
+returned by the gateway.
+
+<TypeTable
+  type={{
+    '400': {
+      type: 'Bad Request',
+      description: 'The input payload is malformed or missing required parameters.',
+    },
+    '401': {
+      type: 'Unauthorized',
+      description: 'The Bearer token provided is invalid or has been revoked.',
+    },
+    '404': {
+      type: 'Not Found',
+      description: 'The specified model identifier does not exist in the environment.',
+    },
+    '429': {
+      type: 'Rate Limit',
+      description: 'The client has exceeded its [Global Rate Limit](/docs/routing-strategies).',
+    },
+    '500': {
+      type: 'Internal Error',
+      description: 'An unexpected failure occurred within the gateway orchestrator.',
+    },
+    '503': {
+      type: 'Exhausted',
+      description: 'Every provider in the [fallback chain](/docs/model-fallbacks) has failed.',
+    },
+  }}
+/>
+
+## Error Triage
+
+When a request fails, the engine attempts to categorize the error 
+to determine if a retry or a fallback is appropriate. If an error 
+is persistent across all providers, the gateway returns the final 
+consolidated status code to the client.
+

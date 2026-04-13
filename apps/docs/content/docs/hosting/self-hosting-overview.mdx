@@ -1,0 +1,15 @@
+---
+title: Self-Hosting Overview
+description: Run your own OpenRouter gateway.
+---
+
+This section is for teams who want to run the OpenRouter gateway on their own infrastructure. OpenRouter is designed to be lightweight, scalable, and easy to deploy using modern containerized or bare-metal setups.
+
+### Architecture
+
+The gateway consists of several core services:
+- **API Gateway**: The entry point for all LLM requests.
+- **Primary Backend**: Manages the dashboard, API keys, and configuration.
+- **DevTools**: A debugging interface for real-time trace inspection.
+- **Redis**: Handles the concurrent key pool and rate limiting.
+- **PostgreSQL**: Stores persistent telemetry and configuration data.

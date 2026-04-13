@@ -1,0 +1,52 @@
+---
+title: Endpoint Overview
+description: High-performance, OpenAI-compatible API endpoints.
+---
+
+The gateway exposes an OpenAI-compatible API surface, so most existing
+clients only need a base URL change and a gateway key to start working.
+
+## Base URL
+
+Point your SDK or HTTP client at your deployed gateway instance:
+
+`https://openrouter-clone-api-gateway.onrender.com/v1`
+
+All primary inference routes are mounted under `/v1`, matching the shape
+expected by OpenAI-compatible tooling.
+
+## Primary Endpoint
+
+The main entry point for model execution is:
+
+### `POST /v1/chat/completions`
+
+Use this endpoint for standard chat completions, streaming responses,
+provider-routed requests, and most app-level inference traffic.
+
+| Header | Value |
+| :--- | :--- |
+| `Authorization` | `Bearer gateway-sk-xxxx` |
+| `Content-Type` | `application/json` |
+
+The request and response formats remain aligned with the OpenAI schema,
+which makes migration from existing OpenAI SDK integrations straightforward.
+
+## Example Request
+
+```bash
+curl https://openrouter-clone-api-gateway.onrender.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $GATEWAY_API_KEY" \
+  -d '{
+    "model": "google/gemini-3.1-pro",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+## Related Reference
+
+- Review [Authentication](/docs/authentication) for gateway key setup.
+- See [Request Schema](/docs/api/request-schema) for supported input fields.
+- See [Response Schema](/docs/api/response-schema) for the normalized output format.
+- See [Error Codes](/docs/api/error-codes) for common failure responses.

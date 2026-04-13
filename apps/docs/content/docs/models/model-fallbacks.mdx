@@ -1,0 +1,44 @@
+---
+title: Model Fallbacks
+description: Configure automated recovery for request failures.
+---
+
+OpenRouter enables automated transition to secondary models when 
+a primary request fails. The gateway triages 5xx errors and 
+rate-limit triggers, maintaining continuity for the client.
+
+## Implementation
+
+Define fallback models using the native request structure. This 
+ensures your application remains resilient to provider instability 
+without custom error-handling logic.
+
+```javascript
+import OpenAI from "openai";
+const openai = new OpenAI({
+  baseURL: "https://openrouter-clone-api-gateway.onrender.com/v1",
+  apiKey: "gateway-sk-12345",
+});
+const response = await openai.chat.completions.create({
+  model: "google/gemini-3.1-pro",
+  messages: [
+    { role: "system", content: "You are a helpful assistant." },
+    { role: "user", content: "What is the capital of Germany?" }
+  ],
+  extra: {
+    fallback_models: ["anthropic/claude-3-haiku", "google/gemini-2.5-flash"],
+    retry: 3
+  },
+});
+```
+
+## Operational Logic
+
+The routing engine follows a strict sequence to ensure 
+request fulfillment.
+
+- Initial attempt triggers the primary model specified in the request.
+- Retry logic executes up to the configured count before switching models.
+- Fallback transition occurs as the engine cascades through the secondary model list.
+- Final triage returns the first successful response or a consolidated error state.
+

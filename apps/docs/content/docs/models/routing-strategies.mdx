@@ -1,0 +1,22 @@
+---
+title: Request Pipeline
+description: The lifecycle of a request through the routing engine.
+---
+
+Every request processed by the gateway flows through a 
+highly structured routing pipeline. Each stage is designed 
+to maximize performance and reliability.
+
+## Execution Sequence
+
+The engine handles orchestration across multiple layers 
+of infrastructure.
+
+- Traffic bounds are enforced by a global rate limiter to prevent system saturation.
+- Optimal providers are selected based on the configured strategy, such as speed or cost efficiency.
+- Health-checked API keys are leased from a Redis-backed pool to manage capacity bounds.
+- Execution occurs at the provider level with standardized request parameters.
+- Failures are triaged by the decision engine to trigger fallbacks if necessary.
+- Responses are normalized and streamed back to the client in a unified format.
+- Telemetry data is persisted asynchronously to ensure zero impact on request latency.
+

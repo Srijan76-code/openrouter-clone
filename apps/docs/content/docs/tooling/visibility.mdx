@@ -1,0 +1,11 @@
+---
+title: Retry & Routing Visibility
+description: understand how the gateway handled failures and selection.
+---
+
+See the "why" behind every request routing decision:
+
+- **Selected Provider**: Which provider was chosen by the [Provider Selector](/docs/provider-selection) and why (cheapest vs. fastest).
+- **Leased Key**: Which key from the Redis Key Pool was used for the execution.
+- **Retry History**: A timeline of any transient failures that triggered internal retries.
+- **Fallback Chain**: If the primary model failed, see the sequence of fallback models and providers that were attempted.
