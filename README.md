@@ -151,7 +151,7 @@ _Class Diagram_
 ![Sequence Diagram](./docs/assets/sequence_diagram.png)
 _Sequence Diagram_
 
-![Usecase Diagram](./docs/assets/use_case_diagram.svg)
+![Usecase Diagram](./docs/assets/usecase_diagram_final.png)
 _Usecase Diagram_
 
 <br>
