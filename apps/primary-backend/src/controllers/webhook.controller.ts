@@ -40,7 +40,7 @@ export const webhookController = {
         const user = await prisma.user.upsert({
           where: { clerkUserId },
           update: { username },
-          create: { clerkUserId, username },
+          create: { clerkUserId, username, credits: 5000000 },
         });
 
         res.status(200).json({ success: true, userId: user.id });

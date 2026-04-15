@@ -11,7 +11,7 @@ model User {
   id            Int      @id @default(autoincrement())
   clerkUserId   String   @unique
   username      String?
-  credits       BigInt   @default(1000000000)
+  credits       BigInt   @default(5000000)
 
   apiKeys       PlatformUserApiKey[]
   byoKeys       UserProviderKey[]
