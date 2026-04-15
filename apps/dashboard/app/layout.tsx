@@ -9,6 +9,7 @@ const inter = Inter({
 });
 
 import { ClerkProvider } from '@clerk/nextjs';
+import { QueryProvider } from "@/components/providers/query-provider";
 
 export const metadata: Metadata = {
   title: "AetherRoute — One API. Every Model.",
@@ -41,7 +42,9 @@ export default function RootLayout({
         <body
           className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
         >
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </body>
       </html>
     </ClerkProvider>

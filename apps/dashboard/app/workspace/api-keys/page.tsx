@@ -13,6 +13,7 @@ import {
   FileText,
   Copy,
   Check,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,9 @@ import {
 } from "@/components/ui/tooltip";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toDollars, formatCurrency } from "@repo/utils";
 
 // ─── Types ───────────────────────────────────────────────────────────
 interface ApiKey {
@@ -113,42 +117,18 @@ function computeExpiry(option: string): string {
   });
 }
 
-// ─── Initial seed data ───────────────────────────────────────────────
-const seedKeys: ApiKey[] = [
-  {
-    id: "1",
-    name: "key2",
-    fullKey: "sk-or-v1-8c7a3f1b2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b94",
-    key: "sk-or-v1-8c7...b94",
-    expires: "Never",
-    lastUsed: "Never",
-    usage: "$0.000",
-    limit: "unlimited",
-    disabled: false,
-  },
-  {
-    id: "2",
-    name: "key2",
-    fullKey: "sk-or-v1-fab9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f7a6b5822",
-    key: "sk-or-v1-fab...822",
-    expires: "Never",
-    lastUsed: "Never",
-    usage: "$0.000",
-    limit: "unlimited",
-    disabled: false,
-  },
-  {
-    id: "3",
-    name: "chatbot key",
-    fullKey: "sk-or-v1-732e1d2c3b4a5f6e7d8c9b0a1f2e3d4c5b6a7f8e9d0c1b2a3f4e96e",
-    key: "sk-or-v1-732...96e",
-    expires: "Never",
-    lastUsed: "Never",
-    usage: "$0.000",
-    limit: "unlimited",
-    disabled: false,
-  },
-];
+// DB models to use internally
+interface DBPlatformUserApiKey {
+  id: number;
+  userId: number;
+  keyHash: string;
+  key: string;
+  name: string;
+  budgetLimit: string | null;
+  isActive: boolean;
+  creditsUsed: string;
+  lastUsedAt: string | null;
+}
 
 // ─── Tooltip wrapper for Info icons in the form ──────────────────────
 function FieldInfo({ text }: { text: string }) {
@@ -238,11 +218,13 @@ function EditKeyDialog({
   onClose,
   apiKey,
   onSave,
+  isSaving,
 }: {
   open: boolean;
   onClose: () => void;
   apiKey: ApiKey | null;
   onSave: (id: string, name: string, limit: string) => void;
+  isSaving: boolean;
 }) {
   const [editName, setEditName] = useState("");
   const [editLimit, setEditLimit] = useState("");
@@ -256,14 +238,26 @@ function EditKeyDialog({
   });
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(o) => !isSaving && !o && onClose()}>
       <DialogContent className="sm:max-w-[425px] bg-card border-border shadow-2xl p-0 gap-0 overflow-hidden">
+        {/* Premium top progress bar when saving */}
+        {isSaving && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden bg-transparent z-10">
+            <div className="h-full w-1/3 bg-linear-to-r from-transparent via-primary to-transparent animate-progress-slide" />
+          </div>
+        )}
         <div className="px-5 py-4 border-b border-border bg-muted/20">
-          <DialogTitle className="text-base font-medium">
+          <DialogTitle className="text-base font-medium flex items-center gap-2">
             Edit API Key
+            {isSaving && (
+              <span className="text-[11px] text-primary font-normal flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-200">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Saving
+              </span>
+            )}
           </DialogTitle>
         </div>
-        <div className="px-5 py-6 space-y-5">
+        <div className={`px-5 py-6 space-y-5 transition-opacity duration-200 ${isSaving ? "opacity-60 pointer-events-none" : ""}`}>
           <div className="space-y-2">
             <Label className="text-[13px] text-muted-foreground font-medium">
               Name
@@ -271,6 +265,7 @@ function EditKeyDialog({
             <Input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
+              disabled={isSaving}
               className="h-9 text-[13px] bg-background border-border"
             />
           </div>
@@ -282,12 +277,18 @@ function EditKeyDialog({
               value={editLimit}
               onChange={(e) => setEditLimit(e.target.value)}
               placeholder="Leave blank for unlimited"
+              disabled={isSaving}
               className="h-9 text-[13px] bg-background border-border"
             />
           </div>
         </div>
         <div className="px-5 py-4 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} className="h-8 px-4 text-[13px]">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isSaving}
+            className="h-8 px-4 text-[13px]"
+          >
             Cancel
           </Button>
           <Button
@@ -295,11 +296,18 @@ function EditKeyDialog({
               if (apiKey) {
                 onSave(apiKey.id, editName, editLimit || "unlimited");
               }
-              onClose();
             }}
-            className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-5 text-[13px] font-medium"
+            disabled={isSaving}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-5 text-[13px] font-medium min-w-[72px] transition-all"
           >
-            Save
+            {isSaving ? (
+              <span className="flex items-center gap-1.5 animate-in fade-in duration-200">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Saving
+              </span>
+            ) : (
+              "Save"
+            )}
           </Button>
         </div>
       </DialogContent>
@@ -369,21 +377,35 @@ function DeleteDialog({
   onClose,
   onConfirm,
   keyName,
+  isDeleting,
 }: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
   keyName: string;
+  isDeleting: boolean;
 }) {
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(o) => !isDeleting && !o && onClose()}>
       <DialogContent className="sm:max-w-[400px] bg-card border-border shadow-2xl p-0 gap-0 overflow-hidden">
+        {/* Premium top progress bar when deleting */}
+        {isDeleting && (
+          <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden bg-transparent z-10">
+            <div className="h-full w-1/3 bg-linear-to-r from-transparent via-destructive to-transparent animate-progress-slide" />
+          </div>
+        )}
         <div className="px-5 py-4 border-b border-border bg-muted/20">
-          <DialogTitle className="text-base font-medium">
+          <DialogTitle className="text-base font-medium flex items-center gap-2">
             Delete API Key
+            {isDeleting && (
+              <span className="text-[11px] text-destructive font-normal flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-200">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Deleting
+              </span>
+            )}
           </DialogTitle>
         </div>
-        <div className="px-5 py-6">
+        <div className={`px-5 py-6 transition-opacity duration-200 ${isDeleting ? "opacity-60" : ""}`}>
           <p className="text-[13px] text-muted-foreground">
             Are you sure you want to delete{" "}
             <span className="text-foreground font-medium">
@@ -393,18 +415,28 @@ function DeleteDialog({
           </p>
         </div>
         <div className="px-5 py-4 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} className="h-8 px-4 text-[13px]">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isDeleting}
+            className="h-8 px-4 text-[13px]"
+          >
             Cancel
           </Button>
           <Button
             variant="destructive"
-            onClick={() => {
-              onConfirm();
-              onClose();
-            }}
-            className="h-8 px-5 text-[13px] font-medium"
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="h-8 px-5 text-[13px] font-medium min-w-[80px] transition-all"
           >
-            Delete
+            {isDeleting ? (
+              <span className="flex items-center gap-1.5 animate-in fade-in duration-200">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                Deleting
+              </span>
+            ) : (
+              "Delete"
+            )}
           </Button>
         </div>
       </DialogContent>
@@ -414,7 +446,109 @@ function DeleteDialog({
 
 // ─── Main Page Component ─────────────────────────────────────────────
 export default function ApiKeysPage() {
-  const [keys, setKeys] = useState<ApiKey[]>(seedKeys);
+  const { getToken } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: dbKeys = [], isLoading } = useQuery<DBPlatformUserApiKey[]>({
+    queryKey: ["apikeys"],
+    queryFn: async () => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/apikeys`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch keys");
+      return res.json();
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (newKey: { name: string; budgetLimit?: number }) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/apikeys`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newKey),
+      });
+      if (!res.ok) throw new Error("Failed to create key");
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["apikeys"] });
+      setRevealKey(data.fullKey);
+      setIsCreateOpen(false);
+      setCreateName("");
+      setCreateLimit("");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/apikeys/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to delete key");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apikeys"] });
+      setDeletingKey(null);
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, name, budgetLimit }: { id: string; name: string; budgetLimit?: number }) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/apikeys/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name, budgetLimit }),
+      });
+      if (!res.ok) throw new Error("Failed to update key");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["apikeys"] });
+      setEditingKey(null);
+    },
+  });
+
+  const [pendingToggleIds, setPendingToggleIds] = useState<Set<string>>(new Set());
+
+  const toggleMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const token = await getToken();
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/apikeys/${id}/toggle`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to toggle key");
+      return res.json();
+    },
+    onMutate: (id) => {
+      setPendingToggleIds((prev) => new Set(prev).add(id));
+    },
+    onSettled: (_data, _error, id) => {
+      setPendingToggleIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      queryClient.invalidateQueries({ queryKey: ["apikeys"] });
+    },
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -438,7 +572,19 @@ export default function ApiKeysPage() {
   const [deletingKey, setDeletingKey] = useState<ApiKey | null>(null);
 
   // ── Filtered keys ─────────────────────────────────────────────────
-  const filteredKeys = keys.filter((k) =>
+  const mappedKeys: ApiKey[] = dbKeys.map((k) => ({
+    id: k.id.toString(),
+    name: k.name,
+    key: k.key,
+    fullKey: "", // only available during creation reveal
+    expires: "Never", // Add expiry logic to backend later if needed
+    lastUsed: k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never",
+    usage: formatCurrency(BigInt(k.creditsUsed), { minimumFractionDigits: 6, maximumFractionDigits: 6 }),
+    limit: k.budgetLimit ? formatCurrency(BigInt(k.budgetLimit)) : "unlimited",
+    disabled: !k.isActive,
+  }));
+
+  const filteredKeys = mappedKeys.filter((k) =>
     k.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -470,76 +616,57 @@ export default function ApiKeysPage() {
 
   // ── Handlers ──────────────────────────────────────────────────────
   const handleCreate = useCallback(() => {
-    const fullKey = generateFullKey();
-    const newKey: ApiKey = {
-      id: generateKeyId(),
+    createMutation.mutate({
       name: createName || "Untitled Key",
-      fullKey,
-      key: maskKey(fullKey),
-      expires: computeExpiry(createExpiry),
-      lastUsed: "Never",
-      usage: "$0.000",
-      limit: createLimit ? `$${createLimit}` : "unlimited",
-      disabled: false,
-    };
-    setKeys((prev) => [newKey, ...prev]);
-    setIsCreateOpen(false);
-    setRevealKey(fullKey);
-    // Reset form
-    setCreateName("");
-    setCreateLimit("");
-    setCreateReset("na");
-    setCreateExpiry("no-expiration");
-  }, [createName, createLimit, createExpiry]);
+      budgetLimit: createLimit ? Number(createLimit) * 1000000 : undefined,
+    });
+  }, [createName, createLimit, createMutation]);
 
   const handleDelete = useCallback((id: string) => {
-    setKeys((prev) => prev.filter((k) => k.id !== id));
+    deleteMutation.mutate(id);
     setSelectedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
       return next;
     });
-  }, []);
+  }, [deleteMutation]);
 
   const handleToggleDisable = useCallback((id: string) => {
-    setKeys((prev) =>
-      prev.map((k) => (k.id === id ? { ...k, disabled: !k.disabled } : k))
-    );
-  }, []);
+    toggleMutation.mutate(id);
+  }, [toggleMutation]);
 
   const handleEditSave = useCallback(
     (id: string, name: string, limit: string) => {
-      setKeys((prev) =>
-        prev.map((k) => (k.id === id ? { ...k, name, limit } : k))
-      );
+      updateMutation.mutate({
+        id,
+        name,
+        budgetLimit: limit === "unlimited" ? undefined : Number(limit) * 1000000,
+      });
     },
-    []
+    [updateMutation]
   );
 
   // ── Bulk helpers ───────────────────────────────────────────────────
   const allSelectedDisabled =
     someSelected &&
-    keys
+    mappedKeys
       .filter((k) => selectedIds.has(k.id))
       .every((k) => k.disabled);
 
   // ── Bulk handlers ─────────────────────────────────────────────────
   const handleBulkDelete = useCallback(() => {
-    setKeys((prev) => prev.filter((k) => !selectedIds.has(k.id)));
+    Array.from(selectedIds).forEach((id) => {
+      deleteMutation.mutate(id);
+    });
     setSelectedIds(new Set());
-  }, [selectedIds]);
+  }, [selectedIds, deleteMutation]);
 
   const handleBulkToggleDisable = useCallback(() => {
-    const shouldEnable = allSelectedDisabled;
-    setKeys((prev) =>
-      prev.map((k) =>
-        selectedIds.has(k.id)
-          ? { ...k, disabled: !shouldEnable }
-          : k
-      )
-    );
+    Array.from(selectedIds).forEach((id) => {
+      toggleMutation.mutate(id);
+    });
     setSelectedIds(new Set());
-  }, [selectedIds, allSelectedDisabled]);
+  }, [selectedIds, toggleMutation]);
 
   return (
     <TooltipProvider>
@@ -700,7 +827,21 @@ export default function ApiKeysPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredKeys.length === 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="h-32"
+                    >
+                      <div className="flex flex-col items-center justify-center gap-3 py-8">
+                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                        <p className="text-[13px] text-muted-foreground animate-pulse">
+                          Fetching your API keys...
+                        </p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : filteredKeys.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={7}
@@ -712,18 +853,23 @@ export default function ApiKeysPage() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredKeys.map((item) => (
+                  filteredKeys.map((item) => {
+                    const isToggling = pendingToggleIds.has(item.id);
+                    return (
                     <TableRow
                       key={item.id}
-                      className={`group border-border hover:bg-muted/30 ${
-                        item.disabled ? "opacity-50" : ""
-                      } ${selectedIds.has(item.id) ? "bg-muted/20" : ""}`}
+                      className={`group border-border hover:bg-muted/30 transition-all duration-300 ${
+                        item.disabled && !isToggling ? "opacity-50" : ""
+                      } ${selectedIds.has(item.id) ? "bg-muted/20" : ""} ${
+                        isToggling ? "bg-linear-to-r from-transparent via-primary/5 to-transparent bg-size-[200%_100%] animate-shimmer" : ""
+                      }`}
                     >
                       <TableCell className="w-10 text-center py-2.5">
                         <Checkbox
                           checked={selectedIds.has(item.id)}
                           onCheckedChange={() => toggleSelectOne(item.id)}
                           className="mx-auto border-white/20 cursor-pointer"
+                          disabled={isToggling}
                         />
                       </TableCell>
                       <TableCell className="py-2.5">
@@ -731,10 +877,18 @@ export default function ApiKeysPage() {
                           <span className="font-medium text-[13px] text-foreground">
                             {item.name}
                           </span>
-                          {item.disabled && (
+                          {isToggling ? (
                             <Badge
                               variant="outline"
-                              className="text-[10px] text-yellow-500 border-yellow-500/30 bg-yellow-500/10 py-0 h-4 rounded-sm"
+                              className="text-[10px] text-primary border-primary/30 bg-primary/10 py-0 h-4 rounded-sm flex items-center gap-1 animate-in fade-in duration-200"
+                            >
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                              {item.disabled ? "Enabling" : "Disabling"}
+                            </Badge>
+                          ) : item.disabled && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] text-yellow-500 border-yellow-500/30 bg-yellow-500/10 py-0 h-4 rounded-sm animate-in fade-in duration-200"
                             >
                               Disabled
                             </Badge>
@@ -794,10 +948,17 @@ export default function ApiKeysPage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleToggleDisable(item.id)}
+                              disabled={isToggling}
                               className="text-[13px] cursor-pointer"
                             >
-                              <Ban className="mr-2 h-3.5 w-3.5" />
-                              {item.disabled ? "Enable" : "Disable"}
+                              {isToggling ? (
+                                <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Ban className="mr-2 h-3.5 w-3.5" />
+                              )}
+                              {isToggling
+                                ? (item.disabled ? "Enabling..." : "Disabling...")
+                                : (item.disabled ? "Enable" : "Disable")}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -812,7 +973,8 @@ export default function ApiKeysPage() {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ))
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
@@ -820,14 +982,29 @@ export default function ApiKeysPage() {
         </Card>
 
         {/* ── Create Key Dialog ──────────────────────────────────────── */}
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <Dialog
+          open={isCreateOpen}
+          onOpenChange={(o) => !createMutation.isPending && setIsCreateOpen(o)}
+        >
           <DialogContent className="sm:max-w-[425px] bg-card border-border shadow-2xl p-0 gap-0 overflow-hidden">
+            {/* Premium top progress bar when creating */}
+            {createMutation.isPending && (
+              <div className="absolute top-0 left-0 right-0 h-0.5 overflow-hidden bg-transparent z-10">
+                <div className="h-full w-1/3 bg-linear-to-r from-transparent via-primary to-transparent animate-progress-slide" />
+              </div>
+            )}
             <div className="px-5 py-4 border-b border-border bg-muted/20">
-              <DialogTitle className="text-base font-medium">
+              <DialogTitle className="text-base font-medium flex items-center gap-2">
                 Create API Key
+                {createMutation.isPending && (
+                  <span className="text-[11px] text-primary font-normal flex items-center gap-1.5 animate-in fade-in slide-in-from-left-1 duration-200">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Creating
+                  </span>
+                )}
               </DialogTitle>
             </div>
-            <div className="px-5 py-6 space-y-5">
+            <div className={`px-5 py-6 space-y-5 transition-opacity duration-200 ${createMutation.isPending ? "opacity-60 pointer-events-none" : ""}`}>
               {/* Name */}
               <div className="space-y-2">
                 <div className="flex items-center gap-1.5">
@@ -840,6 +1017,7 @@ export default function ApiKeysPage() {
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
                   placeholder='e.g. "Chatbot Key"'
+                  disabled={createMutation.isPending}
                   className="h-9 text-[13px] bg-background border-border"
                 />
               </div>
@@ -856,6 +1034,7 @@ export default function ApiKeysPage() {
                   value={createLimit}
                   onChange={(e) => setCreateLimit(e.target.value)}
                   placeholder="Leave blank for unlimited"
+                  disabled={createMutation.isPending}
                   className="h-9 text-[13px] bg-background border-border"
                 />
               </div>
@@ -868,7 +1047,11 @@ export default function ApiKeysPage() {
                   </Label>
                   <FieldInfo text="Once the credits (in $USD) consumed by this API key sum to this amount or more, it will no longer work. Leave blank for no limit." />
                 </div>
-                <Select value={createReset} onValueChange={(v) => setCreateReset(v ?? "na")}>
+                <Select
+                  value={createReset}
+                  onValueChange={(v) => setCreateReset(v ?? "na")}
+                  disabled={createMutation.isPending}
+                >
                   <SelectTrigger className="h-9 text-[13px] bg-background border-border">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -889,7 +1072,11 @@ export default function ApiKeysPage() {
                   </Label>
                   <FieldInfo text='Choose when this API key should expire. Select "No expiration" for a key that never expires.' />
                 </div>
-                <Select value={createExpiry} onValueChange={(v) => setCreateExpiry(v ?? "no-expiration")}>
+                <Select
+                  value={createExpiry}
+                  onValueChange={(v) => setCreateExpiry(v ?? "no-expiration")}
+                  disabled={createMutation.isPending}
+                >
                   <SelectTrigger className="h-9 text-[13px] bg-background border-border">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
@@ -906,12 +1093,28 @@ export default function ApiKeysPage() {
                 </Select>
               </div>
             </div>
-            <div className="px-5 py-4 border-t border-border flex justify-end">
+            <div className="px-5 py-4 border-t border-border flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateOpen(false)}
+                disabled={createMutation.isPending}
+                className="h-8 px-4 text-[13px]"
+              >
+                Cancel
+              </Button>
               <Button
                 onClick={handleCreate}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-5 text-[13px] font-medium"
+                disabled={createMutation.isPending}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 px-5 text-[13px] font-medium min-w-[80px] transition-all"
               >
-                Create
+                {createMutation.isPending ? (
+                  <span className="flex items-center gap-1.5 animate-in fade-in duration-200">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Creating
+                  </span>
+                ) : (
+                  "Create"
+                )}
               </Button>
             </div>
           </DialogContent>
@@ -930,6 +1133,7 @@ export default function ApiKeysPage() {
           onClose={() => setEditingKey(null)}
           apiKey={editingKey}
           onSave={handleEditSave}
+          isSaving={updateMutation.isPending}
         />
 
         {/* ── Details Dialog ─────────────────────────────────────────── */}
@@ -947,6 +1151,7 @@ export default function ApiKeysPage() {
             if (deletingKey) handleDelete(deletingKey.id);
           }}
           keyName={deletingKey?.name || ""}
+          isDeleting={deleteMutation.isPending}
         />
       </div>
     </TooltipProvider>

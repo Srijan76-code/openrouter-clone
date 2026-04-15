@@ -20,11 +20,15 @@ export function toDollars(micros: bigint | number): number {
  * Formats a micro amount for display as USD.
  * Example: 1500000n -> "$1.50"
  */
-export function formatCurrency(micros: bigint | number): string {
+export function formatCurrency(
+  micros: bigint | number,
+  options?: Intl.NumberFormatOptions
+): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 6,
+    ...options,
   }).format(toDollars(micros));
 }
