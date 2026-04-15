@@ -1,0 +1,36 @@
+apps/dashboard/package.json
+  13c1db52828d97cd 16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "aac22ef54ef34eeca51850c7b1a26c01b7ba5e4a",
+  "prompts": {
+    "13c1db52828d97cd": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "48fd0e74-99fe-44fa-a789-201c34fc1468",
+        "model": "copilot/gemini-3.1-pro-preview"
+      },
+      "human_author": "Aryan Patel",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    },
+    "68dab2ee528059a7": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "0739b430-af5d-4b2a-ba8f-41d0feebe112",
+        "model": "copilot/gemini-3.1-pro-preview"
+      },
+      "human_author": "Aryan Patel",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 73,
+      "overriden_lines": 5
+    }
+  }
+}
