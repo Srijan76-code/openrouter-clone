@@ -35,7 +35,7 @@ export function ApiPlayground() {
   const simulateExecution = () => {
     setPlaying(true);
     setRenderedText("");
-    const targetText = aiResponses[activeTab];
+    const targetText = aiResponses[activeTab || ""] || "";
     let i = 0;
     
     const interval = setInterval(() => {

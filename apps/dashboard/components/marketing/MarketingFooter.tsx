@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Zap, Github, Twitter, Linkedin } from "lucide-react";
+import { Zap, Globe, MessageCircle, Mail } from "lucide-react";
 
 export function MarketingFooter() {
   return (
@@ -21,13 +21,13 @@ export function MarketingFooter() {
           </p>
           <div className="flex items-center gap-4 mt-6">
             <Link href="#" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-muted-foreground hover:text-white">
-              <Github className="w-5 h-5" />
+              <Globe className="w-5 h-5" />
             </Link>
             <Link href="#" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-muted-foreground hover:text-white">
-              <Twitter className="w-5 h-5" />
+              <MessageCircle className="w-5 h-5" />
             </Link>
             <Link href="#" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-muted-foreground hover:text-white">
-              <Linkedin className="w-5 h-5" />
+              <Mail className="w-5 h-5" />
             </Link>
           </div>
         </div>
