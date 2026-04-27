@@ -31,6 +31,17 @@
 
 <hr>
 
+## ◈ Live Deployment
+
+| Service | URL |
+| :--- | :--- |
+| **Dashboard** | [openrouter-clone-dashboard.vercel.app](https://openrouter-clone-dashboard.vercel.app/) |
+| **Docs** | [openrouter-clone-docs.vercel.app](https://openrouter-clone-docs.vercel.app/) |
+| **API Gateway** | [openrouter-clone-api-gateway.onrender.com](https://openrouter-clone-api-gateway.onrender.com) |
+| **Primary Backend** | [orbyt-primary-backend.onrender.com](https://orbyt-primary-backend.onrender.com) |
+
+<br>
+
 ## ◈ Project Overview
 
 A unified proxy layer that centralizes access to Large Language Models. Instead of managing complex integration with multiple provider SDKs, handling inconsistent streaming outputs, or writing brittle fallback logic to handle provider outages, you point your application to a single endpoint.
