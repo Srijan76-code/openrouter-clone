@@ -1,7 +1,77 @@
 ---
 title: BYOK — Bring Your Own Key
-description: Unbind your billing from inference costs.
-badge: Coming Soon
+description: Route requests using your own provider API keys through Orbyt.
 ---
 
-<ComingSoon description="Bring Your Own Key documentation is on the way. This section will explain end-user key management, billing separation, and the expected gateway flow for user-supplied provider credentials." />
+BYOK lets you pass your own provider API key directly in a request. 
+Orbyt routes the request through its gateway — handling fallbacks, 
+retries, and streaming normalization — while billing goes straight 
+to your provider account.
+
+## How it works
+
+Pass your provider key via the `extra.byok` field. The gateway will 
+use your key for the upstream provider call instead of a pooled key.
+
+```javascript
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  baseURL: "https://your-orbyt-instance.com/v1",
+  apiKey: "sk-or-v1-your-orbyt-key",
+});
+
+async function main() {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "google/gemini-3.1-pro", // Primary Model
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content: "What is the capital of germany?" },
+      ],
+      temperature: 0.7,
+      stream: false,
+
+      // --- ORBYT CUSTOM EXTENSIONS ---
+      // @ts-expect-error Orbyt custom properties
+      extra: {
+        fallback_models: [
+          "anthropic/claude-3-haiku",
+          "google/gemini-3-flash-preview",
+        ],
+        provider: "cheap",
+        retry: 3,
+        byok: "YOUR_PROVIDER_API_KEY",
+      },
+    });
+
+    console.log(response.choices[0].message.content);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+main();
+```
+
+## Key behavior
+
+- **Routing still applies** — fallback chains, retry policies, and 
+  strategy selection all work as normal.
+- **Your key, your quota** — rate limits and billing are tied to 
+  the provider key you supply, not the Orbyt key pool.
+- **No key storage** — BYOK keys are used for the single request 
+  and never persisted by the gateway.
+
+## Supported providers
+
+Any provider integrated with the gateway supports BYOK. Pass the 
+matching provider key for the model you're targeting:
+
+| Provider | Model prefix | Key format |
+|----------|-------------|------------|
+| Google | `google/*` | `AIza...` |
+| Anthropic | `anthropic/*` | `sk-ant-...` |
+| OpenAI | `openai/*` | `sk-...` |
+| Mistral | `mistral/*` | API key |
+| DeepSeek | `deepseek/*` | API key |
