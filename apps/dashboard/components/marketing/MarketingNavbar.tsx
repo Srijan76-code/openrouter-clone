@@ -31,7 +31,7 @@ export function MarketingNavbar() {
               <Zap className="w-4 h-4 text-purple-400" />
             </div>
           </div>
-          <span className="font-bold text-xl tracking-tight text-white">OpenRouter<span className="text-purple-400">.</span></span>
+          <span className="font-bold text-xl tracking-tight text-white">Orbyt<span className="text-purple-400">.</span></span>
         </Link>
         
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">

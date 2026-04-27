@@ -41,7 +41,7 @@ export default function WorkspaceLayout({
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
             <Rocket className="h-5 w-5 text-primary" />
-            <span className="font-semibold tracking-tight">OpenRouter</span>
+            <span className="font-semibold tracking-tight">Orbyt</span>
           </Link>
 
           <div className="relative hidden w-[300px] md:block">

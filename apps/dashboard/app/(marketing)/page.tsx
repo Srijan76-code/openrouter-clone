@@ -1,31 +1,26 @@
-'use client'
-
-import GrainOverlay from './components/GrainOverlay'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Marquee from './components/Marquee'
-import HowItWorks from './components/HowItWorks'
+import Features from './components/Features'
 import ModelGrid from './components/ModelGrid'
 import CodeBlock from './components/CodeBlock'
-import Features from './components/Features'
-import Pricing from './components/Pricing'
+import HowItWorks from './components/HowItWorks'
+import Tracing from './components/Tracing'
 import ClosingCTA from './components/ClosingCTA'
 import Footer from './components/Footer'
-import './landing.module.css'
 
 export default function LandingPage() {
   return (
     <>
-      <GrainOverlay />
       <Navbar />
       <main>
         <Hero />
         <Marquee />
-        <HowItWorks />
+        <Features />
         <ModelGrid />
         <CodeBlock />
-        <Features />
-        <Pricing />
+        <HowItWorks />
+        <Tracing />
         <ClosingCTA />
       </main>
       <Footer />

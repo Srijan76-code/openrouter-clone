@@ -14,7 +14,7 @@ export function MarketingFooter() {
                 <Zap className="w-4 h-4 text-purple-400" />
               </div>
             </div>
-            <span className="font-bold text-xl tracking-tight text-white">OpenRouter<span className="text-purple-400">.</span></span>
+            <span className="font-bold text-xl tracking-tight text-white">Orbyt<span className="text-purple-400">.</span></span>
           </Link>
           <p className="text-sm text-muted-foreground leading-relaxed">
             The intelligent gateway for all foundation models. Secure, fast, and scalable.
@@ -64,7 +64,7 @@ export function MarketingFooter() {
       </div>
       <div className="max-w-7xl mx-auto px-6 mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} OpenRouter Inc. All rights reserved.
+          © {new Date().getFullYear()} Orbyt Inc. All rights reserved.
         </p>
         <div className="flex items-center gap-6 text-xs text-muted-foreground uppercase tracking-widest font-bold">
           <Link href="#" className="hover:text-white transition-colors">Status</Link>

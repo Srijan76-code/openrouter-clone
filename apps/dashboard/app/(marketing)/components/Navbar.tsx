@@ -1,91 +1,79 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-
 import Link from 'next/link'
+import { Menu } from 'lucide-react'
 import { Show, SignInButton, UserButton } from '@clerk/nextjs'
 import styles from './Navbar.module.css'
+import { MARKETING_LINKS } from '../lib/links'
+
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'Models', href: '#models' },
+  { label: 'Pipeline', href: '#how-it-works' },
+  { label: 'Tracing', href: '#tracing' },
+]
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50)
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  // Lock body scroll when drawer open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
-
-  const closeMenu = () => setMenuOpen(false)
-
   return (
-    <>
-      <nav className={`${styles.nav} ${scrolled ? styles.scrolled : ''}`}>
-        <div className={styles.inner}>
-          <Link href="/" className={styles.logo}>
+    <header className={styles.nav}>
+      <div className={styles.inner}>
+        <div className={styles.left}>
+          <Link href="/" className={styles.brand} aria-label="Orbyt">
+            <span className={styles.brandMark}>O</span>
             Orbyt
           </Link>
-
-          <ul className={styles.links}>
-            <li><a href="#models">Models</a></li>
-            <li><a href={process.env.NEXT_PUBLIC_DOCS_URL}>Docs</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-          </ul>
-
-          <div className="flex items-center gap-4 hidden md:flex">
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className={styles.cta}>Sign In</button>
-              </SignInButton>
-            </Show>
-            <Show when="signed-in">
-              <Link href="/workspace/api-keys" className={styles.cta}>
-                Dashboard
-              </Link>
-              <UserButton />
-            </Show>
-          </div>
-
-          <div className="flex items-center gap-4 md:hidden">
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </div>
-
-          <button
-            className={styles.hamburger}
-            onClick={() => setMenuOpen(o => !o)}
-            aria-label="Toggle menu"
-            aria-expanded={menuOpen}
+          <nav className={styles.links} aria-label="Primary">
+            {NAV_LINKS.map((l) => (
+              <a key={l.label} className={styles.link} href={l.href}>
+                {l.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+        <div className={styles.right}>
+          <a
+            className={styles.docsBtn}
+            href={MARKETING_LINKS.docs}
+            target="_blank"
+            rel="noreferrer"
           >
-            <span />
-            <span />
-            <span />
+            Docs
+          </a>
+          <a
+            className={styles.ghostBtn}
+            href={MARKETING_LINKS.github}
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>
+
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className={styles.primaryBtn} type="button">
+                Sign in
+              </button>
+            </SignInButton>
+          </Show>
+
+          <Show when="signed-in">
+            {/* <Link className={styles.primaryBtn} href="/workspace">
+              Dashboard
+            </Link> */}
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: { width: 28, height: 28 },
+                },
+              }}
+            />
+          </Show>
+
+          <button className={styles.mobileToggle} aria-label="Open menu" type="button">
+            <Menu size={16} />
           </button>
         </div>
-      </nav>
-
-      {/* Mobile drawer */}
-      <div
-        className={`${styles.drawer} ${menuOpen ? styles.drawerOpen : ''}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation menu"
-      >
-        <button className={styles.drawerClose} onClick={closeMenu} aria-label="Close menu">
-          &times;
-        </button>
-        <a href="#models" className={styles.drawerLink} onClick={closeMenu}>Models</a>
-        <a href={process.env.NEXT_PUBLIC_DOCS_URL} className={styles.drawerLink} onClick={closeMenu}>Docs</a>
-        <a href="#pricing" className={styles.drawerLink} onClick={closeMenu}>Pricing</a>
-        <Link href="/workspace/api-keys" className={styles.drawerLink} onClick={closeMenu}>Get API Key</Link>
       </div>
-    </>
+    </header>
   )
 }

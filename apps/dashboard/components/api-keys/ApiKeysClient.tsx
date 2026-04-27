@@ -122,7 +122,7 @@ export default function ApiKeysClient() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold tracking-tight">OpenRouter API Keys</h2>
+            <h2 className="text-xl font-bold tracking-tight">Orbyt API Keys</h2>
             <p className="text-sm text-muted-foreground mt-1">Keys used to authenticate your application with the routing gateway.</p>
           </div>
           <Button size="sm" onClick={() => setIsCreateOpen(true)} className="shadow-[0_0_15px_rgba(201,168,78,0.3)] bg-primary text-primary-foreground hover:bg-primary/90">

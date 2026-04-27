@@ -13,14 +13,11 @@ export const apiKeyController = {
         return;
       }
 
-      const user = await prisma.user.findUnique({
-        where: { clerkUserId }
+      const user = await prisma.user.upsert({
+        where: { clerkUserId },
+        update: {},
+        create: { clerkUserId, credits: 5000000 }
       });
-      
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
 
       const keys = await prisma.platformUserApiKey.findMany({
         where: { userId: user.id },
@@ -43,14 +40,11 @@ export const apiKeyController = {
         return;
       }
 
-      const user = await prisma.user.findUnique({
-        where: { clerkUserId }
+      const user = await prisma.user.upsert({
+        where: { clerkUserId },
+        update: {},
+        create: { clerkUserId, credits: 5000000 }
       });
-
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-        return;
-      }
 
       const { name, rateLimitRPM = 60, rateLimitTPM = 10000, budgetLimit } = req.body;
 
